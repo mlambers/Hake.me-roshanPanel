@@ -15,7 +15,13 @@ roshanPanel.draw = false
 
 roshanPanel.roshanNeedInit = true
 
-local cache_images = {}
+local cache_assets = {
+	icon_roshan_timerbackground_norosh_psd = nil, 
+	icon_roshan_timerbackground_psd = nil, 
+	roshan_timer_roshan_psd = nil, 
+	aegis = nil
+}
+
 local function_floor = math.floor
 local function_ceil = math.ceil
 
@@ -24,11 +30,18 @@ roshanPanel.RoshanTimeDead = 0
 roshanPanel.RoshanMinimumPossibleSpawnTime = 0
 roshanPanel.RoshanMaximumPossibleSpawnTime = 0
 roshanPanel.aegisTimePickup = 0
+roshanPanel.boxSize = Menu.GetValue(roshanPanel.offsetSize)
+roshanPanel.fontRoshanAlive = Renderer.LoadFont("Tahoma", function_floor(roshanPanel.boxSize *0.5), Enum.FontWeight.BOLD)
+roshanPanel.fontRoshanDead = Renderer.LoadFont("Tahoma", function_floor(roshanPanel.boxSize * (1/3)), Enum.FontWeight.BOLD)
 
-function roshanPanel.load_images(k, path, name)
-	if (cache_images[k] == nil) then
-		cache_images[k]	= Renderer.LoadImage((name or path .. k) .. ".png")
+
+function roshanPanel.load_images(path, name)
+	local imageHandle = cache_assets[name]
+
+	if (imageHandle == nil) then
 		roshanPanel.TotalLoad = roshanPanel.TotalLoad + 1
+		imageHandle = Renderer.LoadImage(path .. name .. ".png")
+		cache_assets[name] = imageHandle
 	end
 end
 
@@ -40,30 +53,27 @@ function roshanPanel.init_roshan()
 	roshanPanel.aegisTimePickup = 0
 	
 	roshanPanel.boxSize = Menu.GetValue(roshanPanel.offsetSize)
-	roshanPanel.fontRoshanAlive = Renderer.LoadFont("Tahoma", function_floor(roshanPanel.boxSize*0.5), Enum.FontWeight.BOLD)
-	roshanPanel.fontRoshanDead = Renderer.LoadFont("Tahoma", function_floor(roshanPanel.boxSize*(1/3)), Enum.FontWeight.BOLD)
-	
-	roshanPanel.load_images("icon_roshan_timerbackground_norosh_psd", "", roshanPanel.AssetsPath .. "icon_roshan_timerbackground_norosh_psd")
-	roshanPanel.load_images("icon_roshan_timerbackground_psd", "", roshanPanel.AssetsPath .. "icon_roshan_timerbackground_psd")
-	roshanPanel.load_images("roshan_timer_roshan_psd", "", roshanPanel.AssetsPath .. "roshan_timer_roshan_psd")
-	roshanPanel.load_images("aegis", "", roshanPanel.ItemsPath .. "aegis")
-	
-	Console.Print("==================================================================== \n" .. "Roshan panel init done \nTotal assets loaded: " .. roshanPanel.TotalLoad .. "\n====================================================================")
-end
-
-function roshanPanel.OnGameStart()
-	cache_images = {}
-	roshanPanel.roshanNeedInit = true
-	roshanPanel.init_roshan()
+	roshanPanel.fontRoshanAlive = Renderer.LoadFont("Tahoma", function_floor(roshanPanel.boxSize* 0.5), Enum.FontWeight.BOLD)
+	roshanPanel.fontRoshanDead = Renderer.LoadFont("Tahoma", function_floor(roshanPanel.boxSize* (1/3)), Enum.FontWeight.BOLD)
 end
 
 function roshanPanel.OnGameEnd()
-	cache_images = {}
+	cache_assets = {
+		icon_roshan_timerbackground_norosh_psd = nil, 
+		icon_roshan_timerbackground_psd = nil, 
+		roshan_timer_roshan_psd = nil, 
+		aegis = nil
+	}
+	
 	roshanPanel.roshanNeedInit = true
-	roshanPanel.init_roshan()
+	roshanPanel.draw = false
+	roshanPanel.RoshanAlive = true
+	roshanPanel.RoshanTimeDead = 0
+	roshanPanel.RoshanMinimumPossibleSpawnTime = 0
+	roshanPanel.RoshanMaximumPossibleSpawnTime = 0
+	roshanPanel.aegisTimePickup = 0
+	roshanPanel.TotalLoad = 0
 end
-
-roshanPanel.init_roshan()
 
 function roshanPanel.OnMenuOptionChange(option, old, new)
     if option == roshanPanel.offsetSize then
@@ -81,6 +91,14 @@ function roshanPanel.OnUpdate()
 	if roshanPanel.roshanNeedInit then
         roshanPanel.init_roshan()
 		roshanPanel.draw = true
+		
+		roshanPanel.load_images(roshanPanel.AssetsPath, "icon_roshan_timerbackground_norosh_psd")
+		roshanPanel.load_images(roshanPanel.AssetsPath, "icon_roshan_timerbackground_psd")
+		roshanPanel.load_images(roshanPanel.AssetsPath, "roshan_timer_roshan_psd")
+		roshanPanel.load_images(roshanPanel.ItemsPath, "aegis")
+		
+		Console.Print("==================================================================== \n" .. "Roshan panel init done \nTotal assets loaded: " .. roshanPanel.TotalLoad .. "\n====================================================================")
+		
         roshanPanel.roshanNeedInit = false
     end
 
@@ -128,10 +146,10 @@ function roshanPanel.OnDraw()
 				
 			-- Draw Roshan background image
 			Renderer.SetDrawColor(255, 255, 255, 255)
-			Renderer.DrawImage(cache_images["icon_roshan_timerbackground_psd"], roshan_background_pos_x, roshan_background_pos_y, roshan_background_size, roshan_background_size)
+			Renderer.DrawImage(cache_assets["icon_roshan_timerbackground_psd"], roshan_background_pos_x, roshan_background_pos_y, roshan_background_size, roshan_background_size)
 				
 			-- Draw Roshan image
-			Renderer.DrawImage(cache_images["roshan_timer_roshan_psd"], roshan_pos_x, roshan_pos_y, roshan_size, roshan_size)
+			Renderer.DrawImage(cache_assets["roshan_timer_roshan_psd"], roshan_pos_x, roshan_pos_y, roshan_size, roshan_size)
 				
 		else
 			local notifierText1 = "Time of Death " .. function_floor(roshanPanel.RoshanTimeDead * (1/60)) .. ":" .. function_ceil(roshanPanel.RoshanTimeDead % 60)
@@ -164,10 +182,10 @@ function roshanPanel.OnDraw()
 				
 			-- Draw Roshan background image
 			Renderer.SetDrawColor(255, 255, 255, 255)
-			Renderer.DrawImage(cache_images["icon_roshan_timerbackground_norosh_psd"], roshan_background_pos_x, roshan_background_pos_y, roshan_background_size, roshan_background_size)
+			Renderer.DrawImage(cache_assets["icon_roshan_timerbackground_norosh_psd"], roshan_background_pos_x, roshan_background_pos_y, roshan_background_size, roshan_background_size)
 				
 			-- Draw Roshan image
-			Renderer.DrawImage(cache_images["roshan_timer_roshan_psd"], roshan_pos_x, roshan_pos_y, roshan_size, roshan_size)
+			Renderer.DrawImage(cache_assets["roshan_timer_roshan_psd"], roshan_pos_x, roshan_pos_y, roshan_size, roshan_size)
 				
 			if roshanPanel.aegisTimePickup ~= 0 then
 				-- Config aegis image
@@ -176,7 +194,7 @@ function roshanPanel.OnDraw()
 					
 				-- Draw aegis image
 				Renderer.SetDrawColor(255, 255, 255, 255)	
-				Renderer.DrawImage(cache_images["aegis"], panelPosX, panelPosYaegis, aegisSize, aegisSize)
+				Renderer.DrawImage(cache_assets["aegis"], panelPosX, panelPosYaegis, aegisSize, aegisSize)
 				
 				local timerAegis = function_floor(roshanPanel.aegisTimePickup - GameRules.GetGameTime())
 					
