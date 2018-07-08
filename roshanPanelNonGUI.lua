@@ -14,6 +14,14 @@ roshanPanel.TotalLoad = 0
 roshanPanel.draw = false
 
 roshanPanel.roshanNeedInit = true
+roshanPanel.RoshanAlive = true
+roshanPanel.RoshanTimeDead = 0
+roshanPanel.RoshanMinimumPossibleSpawnTime = 0
+roshanPanel.RoshanMaximumPossibleSpawnTime = 0
+roshanPanel.aegisTimePickup = 0
+roshanPanel.boxSize = nil
+roshanPanel.fontRoshanAlive = nil
+roshanPanel.fontRoshanDead = nil
 
 local cache_assets = {
 	icon_roshan_timerbackground_norosh_psd = nil, 
@@ -24,16 +32,6 @@ local cache_assets = {
 
 local function_floor = math.floor
 local function_ceil = math.ceil
-
-roshanPanel.RoshanAlive = true
-roshanPanel.RoshanTimeDead = 0
-roshanPanel.RoshanMinimumPossibleSpawnTime = 0
-roshanPanel.RoshanMaximumPossibleSpawnTime = 0
-roshanPanel.aegisTimePickup = 0
-roshanPanel.boxSize = Menu.GetValue(roshanPanel.offsetSize)
-roshanPanel.fontRoshanAlive = Renderer.LoadFont("Tahoma", function_floor(roshanPanel.boxSize *0.5), Enum.FontWeight.BOLD)
-roshanPanel.fontRoshanDead = Renderer.LoadFont("Tahoma", function_floor(roshanPanel.boxSize * (1/3)), Enum.FontWeight.BOLD)
-
 
 function roshanPanel.load_images(path, name)
 	local imageHandle = cache_assets[name]
@@ -73,6 +71,12 @@ function roshanPanel.OnGameEnd()
 	roshanPanel.RoshanMaximumPossibleSpawnTime = 0
 	roshanPanel.aegisTimePickup = 0
 	roshanPanel.TotalLoad = 0
+	
+	roshanPanel.boxSize = nil
+	roshanPanel.fontRoshanAlive = nil
+	roshanPanel.fontRoshanDead = nil
+	
+	Console.Print("\n================================ \n=   " .. os.date() .. "   =\n================================ \n= " .. "Roshan panel reset OnGameEnd =\n" .. "================================ \n")
 end
 
 function roshanPanel.OnMenuOptionChange(option, old, new)
@@ -97,7 +101,7 @@ function roshanPanel.OnUpdate()
 		roshanPanel.load_images(roshanPanel.AssetsPath, "roshan_timer_roshan_psd")
 		roshanPanel.load_images(roshanPanel.ItemsPath, "aegis")
 		
-		Console.Print("==================================================================== \n" .. "Roshan panel init done \nTotal assets loaded: " .. roshanPanel.TotalLoad .. "\n====================================================================")
+		Console.Print("\n============================ \n= " .. os.date() .. " =\n============================ \n= " .. "Roshan panel init done   =\n= Total assets loaded: " .. roshanPanel.TotalLoad .. "   =\n============================ \n")
 		
         roshanPanel.roshanNeedInit = false
     end
