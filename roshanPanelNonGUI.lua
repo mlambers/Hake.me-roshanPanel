@@ -10,8 +10,8 @@ roshanPanel.offsetY = Menu.AddOption({"mlambers", "Roshan Panel"}, "3. Panel y o
 roshanPanel.offsetSize = Menu.AddOption({"mlambers", "Roshan Panel"}, "4. Panel size", "", 28, 56, 1)
 
 -- *** Init variable for assets *** --
-roshanPanel.AssetsPath = "~/Extra/"
-roshanPanel.ItemsPath	= "resource/flash3/images/items/"
+roshanPanel.AssetsPath = "panorama/images/hud/reborn/"
+roshanPanel.ItemsPath	= "panorama/images/items/"
 roshanPanel.TotalLoad = 0
 local cache_assets = {
 	icon_roshan_timerbackground_norosh_psd = nil, 
@@ -76,7 +76,7 @@ function roshanPanel.load_images(path, name)
 
 	if (imageHandle == nil) then
 		roshanPanel.TotalLoad = roshanPanel.TotalLoad + 1
-		imageHandle = Renderer.LoadImage(path .. name .. ".png")
+		imageHandle = Renderer.LoadImage(path .. name .. ".vtex_c")
 		cache_assets[name] = imageHandle
 	end
 end
@@ -158,7 +158,7 @@ function roshanPanel.OnUpdate()
 		roshanPanel.load_images(roshanPanel.AssetsPath, "icon_roshan_timerbackground_norosh_psd")
 		roshanPanel.load_images(roshanPanel.AssetsPath, "icon_roshan_timerbackground_psd")
 		roshanPanel.load_images(roshanPanel.AssetsPath, "roshan_timer_roshan_psd")
-		roshanPanel.load_images(roshanPanel.ItemsPath, "aegis")
+		roshanPanel.load_images(roshanPanel.ItemsPath, "aegis_png")
 		
 		Console.Print("\n============================ \n= " .. os.date() .. " =\n============================ \n= " .. "Roshan panel init done   =\n= Total assets loaded: " .. roshanPanel.TotalLoad .. "   =\n============================ \n")
 		
@@ -242,7 +242,7 @@ function roshanPanel.OnDraw()
 					
 				-- Draw aegis image
 				Renderer.SetDrawColor(255, 255, 255, 255)	
-				Renderer.DrawImage(cache_assets["aegis"], configDrawing.panelPosX, panelPosYaegis, aegisSize, aegisSize)
+				Renderer.DrawImage(cache_assets["aegis_png"], configDrawing.panelPosX, panelPosYaegis, aegisSize, aegisSize)
 				
 				local timerAegis = MathematicsFunction.floor(roshanPanel.aegisTimePickup - GameRules.GetGameTime())
 					
